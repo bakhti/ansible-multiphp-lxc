@@ -19,3 +19,26 @@
 - name: New kernel version
   fail: msg="Please reboot the box!"
   when: kernel_upgrade|changed
+
+- name: LXC apt package and options
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - lxc
+    - bridge-utils
+    - libvirt-bin
+    - debootstrap
+    - python-libvirt
+  sudo: yes
+
+- name: CGroup mount point
+  lineinfile:
+    dest=/etc/fstab
+    line='cgroup  /sys/fs/cgroup  cgroup  defaults  0   0'
+    state=present
+  sudo: yes
+  register: cgroup_fstab
+
+- name: Mount cgroup
+  command: mount /sys/fs/cgroup
+  sudo: yes
+  when: cgroup_fstab|changed
