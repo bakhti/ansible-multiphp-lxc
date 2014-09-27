@@ -1,0 +1,21 @@
+---
+- name: Backports apt repo
+  apt_repository:
+    repo="deb http://ftp.debian.org/debian/ {{ ansible_lsb.codename }}-backports main non-free contrib"
+    update_cache=yes
+  when: ansible_distribution == 'Debian'
+  sudo: yes
+
+- name: Backported linux kernel
+  apt:
+    pkg={{ item }} state=latest
+    default_release={{ ansible_lsb.codename }}-backports
+  with_items:
+    - linux-image-686-pae
+    - linux-headers-686-pae
+  sudo: yes
+  register: kernel_upgrade
+
+- name: New kernel version
+  fail: msg="Please reboot the box!"
+  when: kernel_upgrade|changed
