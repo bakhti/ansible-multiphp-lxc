@@ -8,7 +8,7 @@
 
 - name: Backported linux kernel
   apt:
-    pkg={{ item }} state=present install_recommends=no
+    pkg={{ item }} state=latest install_recommends=no
     default_release={{ ansible_lsb.codename }}-backports
   with_items:
     - linux-image-686-pae
